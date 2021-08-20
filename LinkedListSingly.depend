@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1623697006 source:d:\projects\c++\data structure\linkedlistsingly\main.cpp
+	<iostream>
+	<cstdlib>
+
