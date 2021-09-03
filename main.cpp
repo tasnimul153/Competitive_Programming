@@ -1,4 +1,6 @@
 #include <iostream>
+#include <unordered_set>
+#include <stack>
 
 using namespace std;
 
@@ -21,12 +23,14 @@ Node * create_node(int data) {
 class Node {
 public:
     int data;
+    Node * prev;
     Node * next;
 
     Node() {  }
 
     Node(int data) {
         this->data = data;
+        this->prev = NULL;
         this->next = NULL;
     }
 
@@ -176,7 +180,7 @@ void deleteAt(Node * &head, int loc) {
     return deleteAt(head->next, --loc);
 }
 
-/// *********************************************** Delete node of given data **********************************************
+/// ************************************************ Delete node of given data ***********************************************
 
 void deleteData(int data) {
     bool flag = false;
@@ -215,7 +219,7 @@ void deleteData(Node * &head, int data) {
     return deleteData(head->next, data);
 }
 
-/// *********************************************** Search nodes by given data *********************************************
+/// ************************************************ Search nodes by given data **********************************************
 
 // If it returns -1 then node doesn't exist else returned value is the index 
 int isExist(int data) {
@@ -239,7 +243,7 @@ bool isExist(Node * head, int data) {
     return isExist(head->next, data);
 }
 
-/// ***************************************************** Delete List *****************************************************
+/// ****************************************************** Delete List ******************************************************
 
 void deleteList() {
     Node * delNode;
@@ -535,13 +539,537 @@ struct Node* addTwoLists(struct Node* first, struct Node* second) {
     return newList;
 }
 
+/// ************************************ Reverse a linked list in group of given size ***************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/reverse-a-linked-list-in-groups-of-given-size/1
+struct Node *reverse (struct Node *head, int k) { 
+    int counter = 0;
+    struct Node * it = head, * tempNode = head, * tempNode2 = NULL;
+    struct Node * prevNode = NULL, * nextNode = NULL;
+    if(k != 1) {
+        while(it != NULL) {
+            if(counter < k) {
+                nextNode = it->next;
+                it->next = prevNode;
+                prevNode = it;
+                it = nextNode;
+            } else {
+                if(tempNode == head) {
+                    head = prevNode;
+                } else {
+                    tempNode->next = prevNode;
+                    tempNode = tempNode2;
+                }
+                tempNode2 = it;
+                prevNode = NULL;
+                counter = -1;
+            }
+            counter++;
+        }
+        if(tempNode != head)
+            tempNode->next = prevNode;
+        else 
+            head = prevNode;
+    }
+    
+    return head;
+}
+
+/// *********************************** Delete nodes having greater value on right side *************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/delete-nodes-having-greater-value-on-right/1#
+Node * reverseGeeks(Node * &head) {
+    Node * it = head;
+    Node * prevNode = NULL, * nextNode = NULL;
+    
+    while(it != NULL) {
+        nextNode = it->next;
+        it->next = prevNode;
+        prevNode = it;
+        it = nextNode;
+    }
+    
+    return prevNode;
+}
+
+Node *compute(Node * head) {
+    head = reverseGeeks(head);
+    
+    Node * it = head, * delNode;
+    int maxNode = it->data;
+    
+    while(it->next != NULL) {
+        if(maxNode > it->next->data) {
+            delNode = it->next;
+            it->next = delNode->next;
+            delete delNode;
+        } else {
+            maxNode = it->next->data;
+            it = it->next;
+        }
+    }
+    
+    return reverseGeeks(head);
+}
+
+/// ************************************** Segregate even and odd nodes in a Link List **************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/segregate-even-and-odd-nodes-in-a-linked-list5035/1
+Node* divide(int N, Node *head){
+        
+    if(head == NULL) 
+        return head;
+    
+    int data;
+    Node * newNode = NULL;
+    
+    Node * newList = new Node(head->data);
+    Node * left = (head->data % 2 == 0) ? newList : NULL;
+    Node * right = newList;
+    Node * it = head->next;
+    
+    while(it != NULL) {
+        data = it->data;
+        newNode = new Node(data);
+        if(data & 1) {
+            right->next = newNode;
+            right = newNode;
+        } else {
+            if(left) {
+                newNode->next = left->next;
+                left->next = newNode;
+                left = left->next;
+            } else {
+                newNode->next = newList;
+                newList = newNode;
+                left = newList;
+            }
+            if(right->data % 2 == 0) 
+                right = left;
+        }
+        it = it->next;
+    }
+    
+    return newList;
+}
+
+/// *********************************************** Detect Loop in linked list **********************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/detect-loop-in-linked-list/1
+bool detectLoop(Node* head) {
+    Node * tortoise = head, * hare = head;
+    
+    while(hare != NULL && hare->next != NULL) {
+        tortoise = tortoise->next;
+        hare = hare->next->next;
+        if(hare == tortoise)
+            return true;
+    }
+    
+    return false;
+}
+
+/// *********************************************** Delete Loop in linked list **********************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/remove-loop-in-linked-list/1
+void removeLoop(Node* head) {
+    Node * prevNode = NULL;
+    Node * tortoise = head, * hare = head;
+    
+    while(hare && hare->next) {
+        prevNode = tortoise;
+        tortoise = tortoise->next;
+        hare = hare->next->next;
+        if(hare == tortoise) {
+            break;
+        }
+    }
+    
+    if(tortoise == head) {
+        prevNode->next = NULL;
+    } else if(hare && hare->next) {
+        hare = head;
+        while(hare->next != tortoise->next) {
+            hare = hare->next;
+            tortoise = tortoise->next;
+        }
+        
+        tortoise->next = NULL;
+    }
+}
+
+/// ***************************************** Find first node of loop in a linked list **************************************
+
+// LeetCode: https://leetcode.com/problems/linked-list-cycle-ii/
+
+Node *detectCycle(Node *head) {
+    Node * prevSlow = head;
+    Node * fast = head, * slow = head;
+    
+    while(fast != NULL && fast->next != NULL) {
+        prevSlow = slow;
+        fast = fast->next->next;
+        slow = slow->next;
+        if(slow == fast) {
+            break;
+        }
+    }
+    
+    if(prevSlow != NULL && slow == head) {
+        return prevSlow->next;
+    } else if(fast != NULL && fast->next != NULL) {
+        fast = head;
+        while(fast->next != slow->next) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        return slow->next;
+    }
+    
+    return NULL;
+}
+
+/// ************************************* Remove duplicate element from sorted Linked List **********************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/remove-duplicate-element-from-sorted-linked-list/1
+Node *removeDuplicates(Node *head) {
+    Node * delNode = NULL;
+    Node * fast = head->next, * slow = head;
+    
+    while(fast != NULL) {
+        if(fast->data == slow->data) {
+            delNode = slow->next;
+            slow->next = slow->next->next;
+            fast = fast->next;
+            delete delNode;
+        } else {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+    
+    return head;
+}
+
+/// ************************************ Remove duplicate element from unsorted Linked List *********************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/remove-duplicates-from-an-unsorted-linked-list/1
+Node * removeDuplicates_unsorted(Node *head)  {
+    unordered_set <int> seen;
+    
+    Node * current = head, * prev = NULL;
+    
+    while(current != NULL) {
+        if(seen.find(current->data) != seen.end()) {
+            prev->next = current->next;
+            delete current;
+        } else {
+            seen.insert(current->data);
+            prev = current;
+        }
+        current = prev->next;
+    }
+    
+    return head;
+}
+
+/// ************************************* Move last element to the front of the linked list **********************************
+
+// GeeksForGeeks: https://www.geeksforgeeks.org/move-last-element-to-front-of-a-given-linked-list/
+void moveLast() {
+    Node * it = head;
+    if(head == NULL || head->next == NULL) 
+        return;
+    while(it->next->next != NULL)
+        it = it->next;
+    Node * lastNode = it;
+    it->next->next = head;
+    head = it->next;
+    lastNode->next = NULL;
+}
+
+/// ************************************************ Rotate the list k times ************************************************
+
+// LeetCode: https://leetcode.com/problems/rotate-list/
+Node* rotateRight(Node* head, int k) {
+    
+    if(!head || !head->next || k == 0)
+        return head;
+    
+    int counter = 0;
+    Node * it = head, * slow = head;
+    Node * fast = head, * prevSlow = head;
+    
+    while(it != NULL) {
+        it = it->next;
+        counter++;
+    }
+    
+    if(k % counter == 0)
+        return head;
+    
+    for(int i = 0; fast && i < k % counter; i++)
+        fast = fast->next;
+    
+    while(fast != NULL) {
+        fast = fast->next;
+        prevSlow = slow;
+        slow = slow->next;
+    }
+    
+    fast = slow;
+    
+    while(fast->next)
+        fast = fast->next;
+        
+    fast->next = head;
+    head = prevSlow->next;
+    prevSlow->next = NULL;
+    
+    return head;
+}
+
+/// **************************************** Add 1 to a number represented as linked list ***********************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/add-1-to-a-number-represented-as-linked-list/1#
+Node* addOne(Node *head) {
+    if(head == NULL)
+        return head;
+    int counter = 0;
+    Node * it = head, * tracker = head, * prev = NULL;
+    
+    while(it != NULL) {
+        if(it->data != 9) {
+            prev = it;
+            tracker = it;
+            counter = 0;
+        } else if(counter < 1) {
+            counter = 1;
+            tracker = it;
+        } else {
+            counter++;
+        }
+        it = it->next;
+    }
+    
+    if(tracker == prev) {
+        tracker->data++;
+    } else {
+        if(prev) { prev->data++; --counter; }
+        else {
+            tracker->data = 1;
+            if(!tracker->next)
+                tracker->next = new Node(0);
+            tracker = tracker->next;
+            --counter;
+        }
+        while(tracker->next) {
+            tracker->data = 0;
+            tracker = tracker->next;
+            --counter;
+        }
+        if(counter) {
+            tracker->data = 0;
+            tracker->next = new Node(0);
+        } else {
+            tracker->data = 0;
+        }
+    }
+    return head;
+}
+
+/// *********************************************** Intersection of two sorted list *****************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/intersection-of-two-sorted-linked-lists/1
+Node* findIntersection(Node* head1, Node* head2) {
+    if(!head1 || !head2)
+        return head1;
+    Node * newList = NULL, * it;
+    while(head1 && head2) {
+        if(head1->data == head2->data) {
+            Node * newNode = new Node(head1->data);
+            if(!newList) {
+                newList = newNode;
+                it = newList;
+            } else {
+                it->next = newNode;
+                it = it->next;
+            }
+            head1 = head1->next;
+            head2 = head2->next;
+        } else if(head1->data < head2->data) {
+            head1 = head1->next;
+        } else {
+            head2 = head2->next;
+        }
+    }
+    return newList;
+}
+
+/// *************************************** Intersection Point in Y Shapped Linked Lists **********************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/intersection-point-in-y-shapped-linked-lists/1#
+int intersectPoint(Node* head1, Node* head2) {
+    int c1 = 0, c2 = 0;
+    Node * it1 = head1, * it2 = head2;
+    
+    while(it1 || it2) {
+        c1 += it1 != NULL ? 1 : 0;
+        c2 += it2 != NULL ? 1 : 0;
+        if(it1) it1 = it1->next;
+        if(it2) it2 = it2->next;
+    }
+    
+    it1 = head1;
+    it2 = head2;
+    
+    while(c1 < c2) {
+        it2 = it2->next;
+        c2--;
+    }
+    
+    while(c2 < c1) {
+        it1 = it1->next;
+        c1--;
+    }
+    
+    while(it1->next != it2->next) {
+        it1 = it1->next;
+        it2 = it2->next;
+    }
+    
+    return it2->next->data;    
+}
+
+/// ********************************************** Reverse a Doubly Linked List *******************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/reverse-a-doubly-linked-list/1
+Node* reverseDLL(Node * head)
+{
+    Node * current = head, * prevNode = NULL, * nextNode;
+    
+    while(current) {
+        nextNode = current->next;
+        current->next = prevNode;
+        current->prev = nextNode;
+        prevNode = current;
+        current = nextNode;
+    }
+    
+    head = prevNode;
+    return head;
+}
+
+/// ******************************************* Check if a list is palindrome or not **************************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/check-if-linked-list-is-pallindrome/1#
+bool isPalindrome(Node *head) {
+    
+    if(!head || !head->next)
+        return true;
+    
+    stack <int> st;
+    
+    Node * it = head;
+    
+    while(it != NULL) {
+        st.push(it->data);
+        it = it->next;
+    }
+    
+    it = head;
+    while(it != NULL) {
+        if(it->data != st.top())
+            return false;
+        else 
+            st.pop();
+        it = it->next;
+    }
+    return true;
+}
+
+/// ************************************* Multiply two numbers represented in a linked list *******************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/multiply-two-linked-lists/1#
+long long  multiplyTwoLists (Node* l1, Node* l2)
+{
+    int MODU = 1000000007;
+    unsigned long long num1 = 0, num2 = 0;
+    while(l1 || l2) {
+        if(l1) {
+            num1 = (num1 * 10) % MODU + l1->data;
+            l1 = l1->next;
+        }
+        if(l2) {
+            num2 = (num2 * 10) % MODU + l2->data;
+            l2 = l2->next;
+        }
+    }
+    
+    return ((num1 % MODU) * (num2 % MODU)) % MODU;
+}
+
+/// ************************************* Given a linked list of 0s, 1s and 2s, sort it ***********************************
+
+// GeeksForGeeks: https://practice.geeksforgeeks.org/problems/given-a-linked-list-of-0s-1s-and-2s-sort-it/1
+Node* segregate(Node *head) {
+        
+    if(!head || !head->next)
+        return head;
+    
+    Node * zeros = NULL;
+    Node * ones = NULL;
+    Node * twos = NULL;
+    
+    Node * itz = zeros;
+    Node * ito = ones;
+    Node * itt = twos;
+    
+    while(head != NULL) {
+        int data = head->data;
+        if(data == 0) {
+            if(zeros == NULL) {
+                zeros = new Node(data);
+                itz = zeros;
+            } else {
+                itz->next = new Node(data);
+                itz = itz->next;
+            }
+        } else if(data == 1) {
+            if(ones == NULL) {
+                ones = new Node(data);
+                ito = ones;
+            } else {
+                ito->next = new Node(data);
+                ito = ito->next;
+            }
+        } else {
+            if(twos == NULL) {
+                twos = new Node(data);
+                itt = twos;
+            } else {
+                itt->next = new Node(data);
+                itt = itt->next;
+            }
+        }
+        head = head->next;
+    }
+    if(itz)
+        itz->next = ito ? ones : itt ? twos : NULL;
+    else 
+        zeros = ito ? ones : itt ? twos : NULL;
+    if(ito)
+        ito->next = itt ? twos : NULL;
+    return zeros;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     head = NULL;
     for(int i = 1; i <= 10; i++)
         pushBack(i);
     printList();
-    nthFromEnd_Recursive(head, 4);
+    moveLast();
     printList();
     cout << "Length: " << listLength(head) << "\n";
     cout << isExist(head, 9) << "\n"; 
