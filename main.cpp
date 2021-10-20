@@ -328,6 +328,30 @@ void reverseList_Recursive(Node * current) {
     current->next = NULL;
 }
 
+// LeetCode: https://leetcode.com/problems/reverse-linked-list/
+/*
+class Solution {
+public:
+    ListNode * mainHead;
+    ListNode * reverse(ListNode * head) {
+        if(!head->next) {
+            mainHead = head;
+            return mainHead;
+        }
+        reverse(head->next);
+        head->next->next = head;
+        head->next = NULL;
+        return head;
+    }
+    ListNode* reverseList(ListNode* head) {
+        if(!head || !head->next) 
+            return head;
+        reverse(head);
+        return mainHead;
+    }
+};
+*/
+
 /// ************************************ Find the nth node from the end of the linked list **********************************
 
 void nthFromEnd(int n) {
