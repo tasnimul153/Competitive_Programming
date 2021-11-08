@@ -599,6 +599,79 @@ struct Node *reverse (struct Node *head, int k) {
     return head;
 }
 
+/*
+// leetCode: https://leetcode.com/problems/reverse-nodes-in-k-group/
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        // If there is one node or null number of node or reverse by one node
+        if(!head || !head->next || k < 2)
+            return head;
+        
+        int numberOfNodes = 0, nodeCounter = 0, steps;
+        ListNode * leftHead = head, * rightHead;
+        ListNode * current = head, * prev = NULL, * nextNode;
+        
+        // Counting the number of nodes in the list
+        while(current != NULL) {
+            current = current->next;
+            numberOfNodes++;
+        }
+        
+        // If number of nodes we have to reverse is greater than the number of nodes
+        if(numberOfNodes < k)
+            return head;
+        
+        // Now we will reverse the first k number of nodes and assign the new head
+        current = head;
+        // This is the number of reverse we have to do in our nodes
+        steps = numberOfNodes/k;
+        // We reversed the first k number of nodes
+        while(nodeCounter < k) {
+            nextNode = current->next;
+            current->next = prev;
+            prev = current;
+            current = nextNode;
+            nodeCounter++;
+        } 
+        
+        // Assign the new head after the reverse operation
+        head = prev;
+        
+        if(steps == 1) {
+            leftHead->next = current;
+            return head;
+        }
+        
+        // Now we will reverse the second group of k nodes and attach 
+        // it's first node and last node with the list
+        rightHead = current;
+        prev = NULL;
+        nodeCounter = 0;
+        // Reverse every k node in the same manner which is
+        // Reverse first k group and second k group and attach them together
+        while(steps > 1) {
+            nextNode = current->next;
+            current->next = prev;
+            prev = current;
+            current = nextNode;
+            nodeCounter++;
+            if(nodeCounter == k) {
+                leftHead->next = prev;
+                rightHead->next = current;
+                leftHead = rightHead;
+                rightHead = current;
+                nodeCounter = 0;
+                steps--;
+            }
+        }
+        
+        return head;
+    }
+};
+
+*/
+
 /// *********************************** Delete nodes having greater value on right side *************************************
 
 // GeeksForGeeks: https://practice.geeksforgeeks.org/problems/delete-nodes-having-greater-value-on-right/1#
