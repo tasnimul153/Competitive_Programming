@@ -1,0 +1,11 @@
+Array: A collection of elements stored in contiguous memory locations, with a fixed size set at compile time. Once the size is set, it cannot be changed during runtime.
+
+Vector: A dynamically-sized array implemented as a class in the Standard Template Library (STL). It can be resized during runtime, with the elements stored in contiguous memory locations.
+
+List: A doubly-linked list implemented as a class in the Standard Template Library (STL). It is also a dynamically-sized container that allows for constant time insertions and deletions anywhere within the list. However, unlike arrays and vectors, the elements are not stored in contiguous memory locations, but each element has a pointer to the previous and next elements.
+
+In summary, the key differences are:
+
+Array has a fixed size, while Vector and List have dynamic size.
+Array elements are stored in contiguous memory locations, while List elements are stored in non-contiguous memory locations.
+Array and Vector are both arrays, but Vector is dynamic in size and is implemented as a class in STL, while Array is a built-in data type. List is a doubly-linked list.
